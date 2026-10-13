@@ -1,0 +1,60 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix rdf4j: <http://rdf4j.org/schema/rdf4j#> .
+@prefix sesame: <http://www.openrdf.org/schema/sesame#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix fn: <http://www.w3.org/2005/xpath-functions#> .
+
+<http://example.org/vocab-hub#RES001> a <http://example.org/vocab-hub#SemanticResource>;
+  <http://purl.org/dc/terms/title> "Building Topology Ontology";
+  <http://purl.org/dc/terms/description> "An ontology for describing the topological structure of buildings and spaces.";
+  <http://purl.org/dc/terms/publisher> "W3C Linked Building Data Community Group";
+  <http://example.org/vocab-hub#resourceType> "ontology";
+  <http://example.org/vocab-hub#accessLevel> "public";
+  <http://example.org/vocab-hub#namespaceURI> "https://w3id.org/bot#";
+  <http://example.org/vocab-hub#resourceFormat> "ttl";
+  <http://example.org/vocab-hub#availability> "uri";
+  <http://example.org/vocab-hub#sourceURI> <https://w3id.org/bot>;
+  <http://example.org/vocab-hub#domainTag> "building topology";
+  <http://example.org/vocab-hub#graphURI> "http://example.org/graph/ontology/bot" .
+
+<http://example.org/vocab-hub#RES002> a <http://example.org/vocab-hub#SemanticResource>;
+  <http://purl.org/dc/terms/title> "Brick Schema";
+  <http://purl.org/dc/terms/description> "An ontology for representing buildings, equipment, sensors, systems, and spaces.";
+  <http://purl.org/dc/terms/publisher> "Brick Consortium";
+  <http://example.org/vocab-hub#resourceType> "ontology";
+  <http://example.org/vocab-hub#accessLevel> "public";
+  <http://example.org/vocab-hub#namespaceURI> "https://brickschema.org/schema/Brick#";
+  <http://example.org/vocab-hub#resourceFormat> "ttl";
+  <http://example.org/vocab-hub#availability> "uri";
+  <http://example.org/vocab-hub#sourceURI> <https://brickschema.org/schema/1.4.4/Brick.ttl>;
+  <http://example.org/vocab-hub#domainTag> "building automation";
+  <http://example.org/vocab-hub#graphURI> "http://example.org/graph/ontology/brick" .
+
+<http://example.org/vocab-hub#RES003> a <http://example.org/vocab-hub#SemanticResource>;
+  <http://purl.org/dc/terms/title> "IFC OWL Subset";
+  <http://purl.org/dc/terms/description> "An OWL representation of IFC concepts, including building elements, spaces, and spatial structures.";
+  <http://purl.org/dc/terms/publisher> "buildingSMART";
+  <http://example.org/vocab-hub#resourceType> "ontology";
+  <http://example.org/vocab-hub#accessLevel> "public";
+  <http://example.org/vocab-hub#namespaceURI> "https://standards.buildingsmart.org/IFC/DEV/IFC4/ADD2_TC1/OWL#";
+  <http://example.org/vocab-hub#resourceFormat> "owl";
+  <http://example.org/vocab-hub#availability> "uri";
+  <http://example.org/vocab-hub#sourceURI> <https://standards.buildingsmart.org/IFC/DEV/IFC4/ADD2_TC1/OWL>;
+  <http://example.org/vocab-hub#domainTag> "BIM schema";
+  <http://example.org/vocab-hub#graphURI> "http://example.org/graph/ontology/ifc" .
+
+<http://example.org/vocab-hub#RES_SENSOR_OBSERVATION_SAMPLE_AND_ACTUATOR_SOSA_ONTOLOGY_E41F01>
+  a <http://example.org/vocab-hub#SemanticResource>;
+  <http://purl.org/dc/terms/title> "Sensor, Observation, Sample, and Actuator (SOSA) Ontology";
+  <http://purl.org/dc/terms/description> "This ontology is based on the SSN Ontology by the W3C Semantic Sensor Networks Incubator Group (SSN-XG), together with considerations from the W3C/OGC Spatial Data on the Web Working Group.";
+  <http://purl.org/dc/terms/publisher> "Unknown";
+  <http://example.org/vocab-hub#resourceType> "ontology";
+  <http://example.org/vocab-hub#accessLevel> "public";
+  <http://example.org/vocab-hub#namespaceURI> "http://www.w3.org/ns/sosa/";
+  <http://example.org/vocab-hub#resourceFormat> "turtle";
+  <http://example.org/vocab-hub#availability> "uri";
+  <http://example.org/vocab-hub#sourceURI> <http://www.w3.org/ns/sosa/>;
+  <http://example.org/vocab-hub#domainTag> "sensor observation";
+  <http://example.org/vocab-hub#graphURI> "http://example.org/graph/ontology/res_sensor_observation_sample_and_actuator_sosa_ontology_e41f01" .

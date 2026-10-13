@@ -1,0 +1,24 @@
+@prefix rep: <http://www.openrdf.org/config/repository#> .
+@prefix sr: <http://www.openrdf.org/config/repository/sail#> .
+@prefix sail: <http://www.openrdf.org/config/sail#> .
+@prefix graphdb: <http://www.ontotext.com/config/graphdb#> .
+
+[] a rep:Repository ;
+   rep:repositoryID "Vocabulary_Hub_MVP" ;
+   rep:repositoryImpl [
+      rep:repositoryType "graphdb:SailRepository" ;
+      sr:sailImpl [
+         sail:sailType "graphdb:Sail" ;
+         graphdb:ruleset "rdfsplus-optimized" ;
+         graphdb:storage-folder "storage" ;
+         graphdb:enable-context-index "true" ;
+         graphdb:enable-fts-index "false" ;
+         graphdb:fts-indexes ("default" "iri") ;
+         graphdb:fts-string-literals-index "default" ;
+         graphdb:fts-iris-index "none" ;
+         graphdb:entity-id-size "32" ;
+         graphdb:entity-index-size "10000000" ;
+         graphdb:enable-predicate-list "true" ;
+         graphdb:read-only "false"
+      ]
+   ] .

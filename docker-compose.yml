@@ -1,0 +1,24 @@
+services:
+  graphdb:
+    image: ontotext/graphdb:10.8.4
+    ports:
+      - "7200:7200"
+    volumes:
+      - graphdb-data:/opt/graphdb/home
+
+  vocabularyhub-backend:
+    build: .
+    environment:
+      PORT: 3000
+      GRAPHDB_URL: http://graphdb:7200/repositories/Vocabulary_Hub_MVP
+      GRAPHDB_MAPPING_GRAPH: http://example.org/graph/hub/mappings
+      GRAPHDB_RESOURCE_GRAPH: http://example.org/graph/hub/resources
+      GRAPHDB_IFC_GRAPH: http://example.org/graph/ontology/ifc
+      CORS_ORIGIN: http://localhost:5173,http://localhost:8080
+    ports:
+      - "3000:3000"
+    depends_on:
+      - graphdb
+
+volumes:
+  graphdb-data:

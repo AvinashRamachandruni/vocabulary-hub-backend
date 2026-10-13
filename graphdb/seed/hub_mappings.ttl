@@ -1,0 +1,102 @@
+@prefix bot: <https://w3id.org/bot#> .
+@prefix brick: <https://brickschema.org/schema/Brick#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix hub: <http://example.org/vocab-hub#> .
+@prefix ifc: <https://standards.buildingsmart.org/IFC/DEV/IFC4/ADD2_TC1/OWL#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix sosa: <http://www.w3.org/ns/sosa/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+hub:HC001 a skos:Concept ;
+    skos:altLabel "area"@en,
+        "room"@en,
+        "zone"@en ;
+    skos:definition "A spatial entity or area used to represent rooms, zones, or other bounded spaces across semantic resources."@en ;
+    skos:exactMatch brick:Space,
+        ifc:IfcSpace,
+        bot:Space ;
+    skos:prefLabel "space"@en ;
+    skos:relatedMatch brick:Room .
+
+hub:MAP_BUILDING_30206374 a hub:ConceptMapping ;
+    hub:confidence "high" ;
+    hub:mappingSource "semi-automatic" ;
+    hub:relation skos:exactMatch ;
+    hub:sourceConcept hub:HC_BUILDING ;
+    hub:targetTerm bot:Building ;
+    hub:validationStatus "draft" ;
+    dcterms:created "2026-05-07"^^xsd:date .
+
+hub:MAP_BUILDING_478E8340 a hub:ConceptMapping ;
+    hub:confidence "high" ;
+    hub:mappingSource "semi-automatic" ;
+    hub:relation skos:exactMatch ;
+    hub:sourceConcept hub:HC_BUILDING ;
+    hub:targetTerm brick:Building ;
+    hub:validationStatus "draft" ;
+    dcterms:created "2026-05-07"^^xsd:date .
+
+hub:MAP_BUILDING_A6D3B5C6 a hub:ConceptMapping ;
+    hub:confidence "high" ;
+    hub:mappingSource "semi-automatic" ;
+    hub:relation skos:exactMatch ;
+    hub:sourceConcept hub:HC_BUILDING ;
+    hub:targetTerm ifc:IfcBuilding ;
+    hub:validationStatus "draft" ;
+    dcterms:created "2026-05-07"^^xsd:date .
+
+hub:MAP_BUILDING_FC8465BB a hub:ConceptMapping ;
+    hub:confidence "high" ;
+    hub:mappingSource "semi-automatic" ;
+    hub:relation skos:exactMatch ;
+    hub:sourceConcept hub:HC_BUILDING ;
+    hub:targetTerm <https://w3id.org/rec#Building> ;
+    hub:validationStatus "draft" ;
+    dcterms:created "2026-05-07"^^xsd:date .
+
+hub:MAP_OBSERVATION_EB87D9BE a hub:ConceptMapping ;
+    hub:confidence "high" ;
+    hub:mappingSource "semi-automatic" ;
+    hub:relation skos:exactMatch ;
+    hub:sourceConcept hub:HC_OBSERVATION ;
+    hub:targetTerm sosa:Observation ;
+    hub:validationStatus "validated" ;
+    dcterms:created "2026-05-06"^^xsd:date .
+
+hub:MAP_SENSOR_84E27ABD a hub:ConceptMapping ;
+    hub:confidence "high" ;
+    hub:mappingSource "semi-automatic" ;
+    hub:relation skos:exactMatch ;
+    hub:sourceConcept hub:HC_SENSOR ;
+    hub:targetTerm sosa:Sensor ;
+    hub:validationStatus "validated" ;
+    dcterms:created "2026-05-18"^^xsd:date,
+        "2026-05-19"^^xsd:date .
+
+hub:MAP_SENSOR_C40F64B2 a hub:ConceptMapping ;
+    hub:confidence "high" ;
+    hub:mappingSource "semi-automatic" ;
+    hub:relation skos:exactMatch ;
+    hub:sourceConcept hub:HC_SENSOR ;
+    hub:targetTerm brick:Sensor ;
+    hub:validationStatus "validated" ;
+    dcterms:created "2026-05-18"^^xsd:date,
+        "2026-05-19"^^xsd:date .
+
+hub:HC_OBSERVATION a skos:Concept ;
+    skos:exactMatch sosa:Observation ;
+    skos:prefLabel "observation"@en .
+
+hub:HC_SENSOR a skos:Concept ;
+    skos:exactMatch sosa:Sensor,
+        brick:Sensor,
+        ifc:IfcSensor ;
+    skos:prefLabel "sensor"@en .
+
+hub:HC_BUILDING a skos:Concept ;
+    skos:exactMatch brick:Building,
+        ifc:IfcBuilding,
+        bot:Building,
+        <https://w3id.org/rec#Building> ;
+    skos:prefLabel "building"@en .
+
