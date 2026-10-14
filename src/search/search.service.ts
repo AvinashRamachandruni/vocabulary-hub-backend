@@ -46,7 +46,13 @@ ORDER BY ?resourceTitle ?matchRelation ?matchedTerm`);
   }
 
   async discover(q: string) {
-    const needle = escapeSparqlString(q.toLowerCase());
+    const normalize = (text: string) => text.replace(/([a-z])([A-Z])/g, '$1 $2')
+      .toLowerCase().replace(/[_-]+/g, ' ').replace(/\s+/g, ' ').trim();
+    const normalizedQuery = normalize(q);
+    if (!normalizedQuery) return [];
+    const escapeRegex = (text: string) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const candidatePattern = escapeSparqlString(normalizedQuery.split(' ').map(escapeRegex).join('[ _-]*'));
+    const wordPattern = new RegExp(`(^|[^a-z0-9])${escapeRegex(normalizedQuery)}([^a-z0-9]|$)`);
     const rows = await this.graphdb.select(`
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
@@ -57,16 +63,32 @@ WHERE {
     ?term ?p ?o .
     OPTIONAL { ?term rdfs:label ?rdfsLabel . }
     OPTIONAL { ?term skos:prefLabel ?skosLabel . }
-    BIND(COALESCE(?rdfsLabel, ?skosLabel, "") AS ?label)
     OPTIONAL { ?term a ?type . }
+  }
+    BIND(COALESCE(STR(?rdfsLabel), STR(?skosLabel), "") AS ?label)
     FILTER(
-      CONTAINS(LCASE(STR(?term)), "${needle}") ||
-      CONTAINS(LCASE(STR(?label)), "${needle}")
+      REGEX(STR(?term), "${candidatePattern}", "i") ||
+      REGEX(STR(?label), "${candidatePattern}", "i")
     )
     FILTER(?graph NOT IN (<${this.graphdb.mappingGraph}>, <${this.graphdb.resourceGraph}>))
-  }
+    FILTER(!STRSTARTS(STR(?graph), "http://example.org/vocab-hub/mapping/"))
 }
-LIMIT 200`);
-    return rows.map((r) => ({ graph: val(r, 'graph'), term: val(r, 'term'), label: val(r, 'label'), type: val(r, 'type') }));
+`);
+    const ranked = rows.map(row => {
+      const result = { graph: val(row, 'graph'), term: val(row, 'term'), label: val(row, 'label'), type: val(row, 'type') };
+      const termText = normalize(result.term.split(/[/#]/).pop() ?? '');
+      const labelText = normalize(result.label);
+      const rank = [termText, labelText].some(text => text === normalizedQuery) ? 0
+        : [termText, labelText].some(text => wordPattern.test(text)) ? 1
+          : [termText, labelText].some(text => text.includes(normalizedQuery)) ? 2 : 3;
+      return { result, rank, labelText, termText };
+    });
+    ranked.sort((left, right) => left.rank - right.rank
+      || left.labelText.localeCompare(right.labelText)
+      || left.termText.localeCompare(right.termText)
+      || left.result.term.localeCompare(right.result.term)
+      || left.result.graph.localeCompare(right.result.graph)
+      || left.result.type.localeCompare(right.result.type));
+    return ranked.slice(0, 200).map(row => row.result);
   }
 }

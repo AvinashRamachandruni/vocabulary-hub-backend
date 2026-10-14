@@ -4,3 +4,8 @@ export declare class CreateMappingDto {
     relation?: 'exactMatch' | 'relatedMatch';
     conceptUri?: string;
 }
+export declare class UploadAlignmentDto {
+    id: string;
+    sourceOntology: string;
+    targetOntology: string;
+}

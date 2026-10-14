@@ -17,6 +17,22 @@ export declare class OntologiesService {
         format?: string;
         domain?: string;
     }>;
+    registerUpload(dto: RegisterOntologyDto, file: Express.Multer.File): Promise<{
+        uploadedFile: string;
+        bytes: number;
+        resourceUri: string;
+        graphUri: string;
+        id: string;
+        title: string;
+        namespace: string;
+        sourceUrl: string;
+        description?: string;
+        publisher?: string;
+        resourceType?: string;
+        accessLevel?: string;
+        format?: string;
+        domain?: string;
+    }>;
     sync(id: string, sourceUrl: string, contentType?: string): Promise<{
         id: string;
         graphUri: string;

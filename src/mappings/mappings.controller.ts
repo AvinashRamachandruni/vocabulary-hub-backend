@@ -1,12 +1,30 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { CreateMappingDto } from './mappings.dto';
+import { BadRequestException, Body, Controller, Get, Post, Query, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { CreateMappingDto, UploadAlignmentDto } from './mappings.dto';
 import { MappingsService } from './mappings.service';
 
 @ApiTags('Mappings')
 @Controller('mappings')
 export class MappingsController {
   constructor(private readonly service: MappingsService) {}
+
+  @Get('alignments')
+  @ApiOperation({ summary: 'List uploaded ontology alignments' })
+  alignments() { return this.service.listAlignments(); }
+
+  @Post('alignments/upload')
+  @UseInterceptors(FileInterceptor('file', { limits: { fileSize: 25 * 1024 * 1024 } }))
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({ schema: { type: 'object', required: ['id', 'sourceOntology', 'targetOntology', 'file'], properties: {
+    id: { type: 'string' }, sourceOntology: { type: 'string' }, targetOntology: { type: 'string' },
+    file: { type: 'string', format: 'binary' },
+  } } })
+  @ApiOperation({ summary: 'Upload a Turtle alignment between two registered ontologies' })
+  uploadAlignment(@Body() dto: UploadAlignmentDto, @UploadedFile() file?: Express.Multer.File) {
+    if (!file) throw new BadRequestException('An alignment Turtle file is required');
+    return this.service.uploadAlignment(dto, file);
+  }
 
   @Get()
   @ApiOperation({ summary: 'List curated SKOS exact/related mappings' })

@@ -42,6 +42,15 @@ INSERT DATA {
 }`);
         return { ...dto, resourceUri, graphUri };
     }
+    async registerUpload(dto, file) {
+        if (!file.originalname.toLowerCase().endsWith('.ttl')) {
+            throw new common_1.BadRequestException('Only .ttl files are supported for ontology upload');
+        }
+        const graphUri = `http://example.org/graph/ontology/${encodeURIComponent(dto.id)}`;
+        await this.graphdb.upload(file.buffer, 'text/turtle', graphUri, dto.sourceUrl);
+        const registered = await this.register({ ...dto, format: 'text/turtle' });
+        return { ...registered, uploadedFile: file.originalname, bytes: file.size };
+    }
     async sync(id, sourceUrl, contentType) {
         const graphUri = `http://example.org/graph/ontology/${encodeURIComponent(id)}`;
         const response = await fetch(sourceUrl, { headers: { Accept: 'text/turtle, application/rdf+xml, application/ld+json;q=0.9, */*;q=0.1' } });
@@ -50,7 +59,7 @@ INSERT DATA {
         const body = Buffer.from(await response.arrayBuffer());
         const type = contentType || response.headers.get('content-type')?.split(';')[0] || 'text/turtle';
         await this.graphdb.update(`CLEAR GRAPH <${graphUri}>`);
-        await this.graphdb.upload(body, type, graphUri);
+        await this.graphdb.upload(body, type, graphUri, sourceUrl);
         return { id, graphUri, sourceUrl, contentType: type, bytes: body.length, syncedAt: new Date().toISOString() };
     }
 };

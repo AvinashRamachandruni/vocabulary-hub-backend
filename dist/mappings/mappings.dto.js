@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CreateMappingDto = void 0;
+exports.UploadAlignmentDto = exports.CreateMappingDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
 class CreateMappingDto {
@@ -42,4 +42,26 @@ __decorate([
     (0, class_validator_1.IsUrl)({ require_tld: false }),
     __metadata("design:type", String)
 ], CreateMappingDto.prototype, "conceptUri", void 0);
+class UploadAlignmentDto {
+    id;
+    sourceOntology;
+    targetOntology;
+}
+exports.UploadAlignmentDto = UploadAlignmentDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 'Brick-bot' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.Matches)(/^[A-Za-z0-9][A-Za-z0-9_-]{0,99}$/),
+    __metadata("design:type", String)
+], UploadAlignmentDto.prototype, "id", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)(),
+    (0, class_validator_1.IsUrl)({ require_tld: false }),
+    __metadata("design:type", String)
+], UploadAlignmentDto.prototype, "sourceOntology", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)(),
+    (0, class_validator_1.IsUrl)({ require_tld: false }),
+    __metadata("design:type", String)
+], UploadAlignmentDto.prototype, "targetOntology", void 0);
 //# sourceMappingURL=mappings.dto.js.map

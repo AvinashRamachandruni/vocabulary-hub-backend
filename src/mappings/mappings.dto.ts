@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsIn, IsOptional, IsString, IsUrl, MinLength } from 'class-validator';
+import { IsIn, IsOptional, IsString, IsUrl, Matches, MinLength } from 'class-validator';
 
 export class CreateMappingDto {
   @ApiProperty({ example: 'air handling unit' })
@@ -17,4 +17,16 @@ export class CreateMappingDto {
   @ApiPropertyOptional({ description: 'Optional preferred URI for the hub concept.' })
   @IsOptional() @IsUrl({ require_tld: false })
   conceptUri?: string;
+}
+
+export class UploadAlignmentDto {
+  @ApiProperty({ example: 'Brick-bot' })
+  @IsString() @Matches(/^[A-Za-z0-9][A-Za-z0-9_-]{0,99}$/)
+  id!: string;
+
+  @ApiProperty() @IsUrl({ require_tld: false })
+  sourceOntology!: string;
+
+  @ApiProperty() @IsUrl({ require_tld: false })
+  targetOntology!: string;
 }

@@ -17,6 +17,37 @@ npm run start:dev
 API: `http://localhost:3000/api`  
 Swagger: `http://localhost:3000/swagger`
 
+## Ontology alignments
+
+`POST /api/mappings/alignments/upload` accepts multipart fields `id`,
+`sourceOntology`, `targetOntology`, and a `file` containing Turtle (up to 25 MB).
+The ontology fields are resource URIs from `/api/vocabularies`; select two
+different registered ontologies with named graphs. IDs contain letters, numbers,
+hyphens, or underscores, start with a letter or number, and are at most 100 characters.
+
+Each alignment is preserved in its own named graph, for example
+`http://example.org/vocab-hub/mapping/Brick-bot`. This graph URI is also the
+parser base for relative IRIs unless the Turtle declares its own base.
+Use absolute term IRIs or an explicit `@base` when the alignment has another base.
+Existing IDs are rejected rather than silently overwritten.
+
+`GET /api/mappings/alignments` lists uploaded files and their selected ontologies.
+`GET /api/mappings` includes manual mappings and imported SKOS/OWL relations or
+Alignment API cells (`entity1`, `entity2`, `relation`). Imported ontology-to-ontology
+alignments are distinct from the manual hub-concept mappings used by curated search.
+
+Discovery ranks exact label/local-name matches, whole-word matches, partial
+label/local-name matches, and finally full-URI-only matches before limiting results.
+It does not search descriptions or other literal fields.
+
+After building, run the workflow checks with Node 22:
+
+```bash
+node --env-file=.env --test scripts/test-workflows.cjs
+```
+
+The GraphDB checks are read-only. Without `GRAPHDB_URL`, they are skipped.
+
 ## Production build
 
 ```bash

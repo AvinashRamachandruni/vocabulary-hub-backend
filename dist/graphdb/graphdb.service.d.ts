@@ -10,6 +10,6 @@ export declare class GraphdbService {
     constructor(config: ConfigService);
     select(query: string): Promise<any[]>;
     update(update: string): Promise<void>;
-    upload(content: Buffer | string, contentType: string, graphUri: string): Promise<void>;
+    upload(content: Buffer | string, contentType: string, graphUri: string, baseUri?: string): Promise<void>;
     ping(): Promise<boolean>;
 }

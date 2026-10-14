@@ -44,8 +44,10 @@ export class GraphdbService {
     if (!response.ok) throw new ServiceUnavailableException(`GraphDB UPDATE failed: ${response.status} ${await response.text()}`);
   }
 
-  async upload(content: Buffer | string, contentType: string, graphUri: string): Promise<void> {
-    const url = `${this.statementsEndpoint}?context=${encodeURIComponent(`<${graphUri}>`)}`;
+  async upload(content: Buffer | string, contentType: string, graphUri: string, baseUri?: string): Promise<void> {
+    const params = new URLSearchParams({ context: `<${graphUri}>` });
+    if (baseUri) params.set('baseURI', `<${baseUri}>`);
+    const url = `${this.statementsEndpoint}?${params}`;
     const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': contentType },
