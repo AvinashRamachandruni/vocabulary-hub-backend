@@ -80,3 +80,32 @@ test('GraphDB executes discovery over loaded ontology graphs without null-litera
   assert.ok(Array.isArray(await service.list()));
   assert.ok(Array.isArray(await service.listAlignments()));
 });
+
+test('curated alignment endpoints remain bound in both search directions', {
+  skip: !process.env.GRAPHDB_URL,
+}, async () => {
+  let query;
+  await new SearchService({ ...graphs, select: async text => { query = text; return []; } }).curated('Space');
+  const directionPattern = query.match(/VALUES \?reverse[\s\S]+?AS \?matchedTerm\)/);
+  assert.ok(directionPattern);
+  const graphdb = new GraphdbService(new ConfigService(process.env));
+  const rows = await graphdb.select(`SELECT ?sourceTerm ?matchedTerm WHERE {
+    VALUES (?alignmentSource ?alignmentTarget) {
+      (<https://brickschema.org/schema/1.1/Brick#Space> <https://w3id.org/bot#Space>)
+    }
+    ${directionPattern[0]}
+  }`);
+  assert.equal(rows.length, 2);
+  assert.deepEqual(new Set(rows.map(row => `${row.sourceTerm.value} -> ${row.matchedTerm.value}`)), new Set([
+    'https://brickschema.org/schema/1.1/Brick#Space -> https://w3id.org/bot#Space',
+    'https://w3id.org/bot#Space -> https://brickschema.org/schema/1.1/Brick#Space',
+  ]));
+  const service = new SearchService(graphdb);
+  for (const relation of ['all', 'exact', 'related']) {
+    const matches = await service.curated('Space', relation);
+    assert.ok(Array.isArray(matches));
+    if (relation === 'exact') {
+      assert.ok(matches.every(match => !match.relation.endsWith('subClassOf')));
+    }
+  }
+});

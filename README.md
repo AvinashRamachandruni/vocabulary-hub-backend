@@ -33,8 +33,10 @@ Existing IDs are rejected rather than silently overwritten.
 
 `GET /api/mappings/alignments` lists uploaded files and their selected ontologies.
 `GET /api/mappings` includes manual mappings and imported SKOS/OWL relations or
-Alignment API cells (`entity1`, `entity2`, `relation`). Imported ontology-to-ontology
-alignments are distinct from the manual hub-concept mappings used by curated search.
+Alignment API cells (`entity1`, `entity2`, `relation`). Curated search includes both
+manual hub-concept mappings and registered ontology alignments, matching either
+alignment endpoint by URI or label. OWL equivalence and Alignment API `=` count as
+exact matches; subclass and subproperty relations count as related matches.
 
 Discovery ranks exact label/local-name matches, whole-word matches, partial
 label/local-name matches, and finally full-URI-only matches before limiting results.

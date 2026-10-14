@@ -10,6 +10,8 @@ export declare class SearchController {
         term: any;
         label: any;
         relation: any;
+        sourceTerm: any;
+        graph: any;
     }[]>;
     discover(q: string): Promise<{
         graph: any;

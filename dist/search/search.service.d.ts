@@ -9,6 +9,8 @@ export declare class SearchService {
         term: any;
         label: any;
         relation: any;
+        sourceTerm: any;
+        graph: any;
     }[]>;
     discover(q: string): Promise<{
         graph: any;

@@ -20,37 +20,71 @@ let SearchService = class SearchService {
         this.graphdb = graphdb;
     }
     async curated(q, relation = 'all', access = 'all') {
-        const concept = (0, sparql_1.escapeSparqlString)(q.toLowerCase());
+        const query = q.trim().toLowerCase();
+        if (!query)
+            return [];
+        const concept = (0, sparql_1.escapeSparqlString)(query);
+        const termPattern = (0, sparql_1.escapeSparqlString)(query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/[ _-]+/g, '[ _-]*'));
         const relationClause = relation === 'exact'
-            ? 'FILTER(?matchRelation = skos:exactMatch)'
+            ? 'FILTER(?matchRelation IN (skos:exactMatch, owl:equivalentClass, owl:equivalentProperty, owl:sameAs) || STR(?matchRelation) = "=")'
             : relation === 'related'
-                ? 'FILTER(?matchRelation = skos:relatedMatch)'
-                : 'FILTER(?matchRelation IN (skos:exactMatch, skos:relatedMatch))';
+                ? 'FILTER(?matchRelation IN (skos:relatedMatch, skos:closeMatch, skos:broadMatch, skos:narrowMatch, rdfs:subClassOf, rdfs:subPropertyOf) || STR(?matchRelation) IN ("<", ">", "~"))'
+                : '';
         const accessClause = access !== 'all' ? `FILTER(LCASE(STR(?accessLevel)) = "${(0, sparql_1.escapeSparqlString)(access.toLowerCase())}")` : '';
         const rows = await this.graphdb.select(`
 PREFIX hub: <http://example.org/vocab-hub#>
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX dcterms: <http://purl.org/dc/terms/>
-SELECT DISTINCT ?resourceTitle ?accessLevel ?namespaceURI ?matchedTerm ?termLabel ?matchRelation
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX align: <http://knowledgeweb.semanticweb.org/heterogeneity/alignment#>
+SELECT DISTINCT ?resourceTitle ?accessLevel ?namespaceURI ?matchedTerm ?termLabel ?matchRelation ?sourceTerm ?alignmentGraph
 WHERE {
-  GRAPH <${this.graphdb.mappingGraph}> {
-    ?hubConcept a skos:Concept ; skos:prefLabel|skos:altLabel ?queryLabel .
-    FILTER(LCASE(STR(?queryLabel)) = "${concept}")
-    ?hubConcept ?matchRelation ?matchedTerm .
-    ${relationClause}
+  {
+    GRAPH <${this.graphdb.mappingGraph}> {
+      ?hubConcept a skos:Concept ; skos:prefLabel|skos:altLabel ?queryLabel .
+      FILTER(LCASE(STR(?queryLabel)) = "${concept}")
+      ?hubConcept ?matchRelation ?matchedTerm .
+      FILTER(?matchRelation IN (skos:exactMatch, skos:relatedMatch))
+    }
+  } UNION {
+    GRAPH <${this.graphdb.mappingGraph}> { ?alignmentGraph a hub:OntologyAlignment . }
+    GRAPH ?alignmentGraph {
+      {
+        ?alignmentSource ?matchRelation ?alignmentTarget .
+        FILTER(?matchRelation IN (skos:exactMatch, skos:relatedMatch, skos:closeMatch,
+          skos:broadMatch, skos:narrowMatch, owl:equivalentClass, owl:equivalentProperty,
+          owl:sameAs, rdfs:subClassOf, rdfs:subPropertyOf))
+      } UNION {
+        ?cell align:entity1 ?alignmentSource ; align:entity2 ?alignmentTarget ; align:relation ?matchRelation .
+      }
+    }
+    VALUES ?reverse { false true }
+    BIND(IF(?reverse, ?alignmentTarget, ?alignmentSource) AS ?sourceTerm)
+    BIND(IF(?reverse, ?alignmentSource, ?alignmentTarget) AS ?matchedTerm)
+    OPTIONAL {
+      GRAPH ?sourceLabelGraph { ?sourceTerm rdfs:label|skos:prefLabel ?sourceLabel . }
+      FILTER(LANG(?sourceLabel) IN ("en", ""))
+    }
+    FILTER(REGEX(STR(?sourceTerm), "${termPattern}", "i") ||
+      REGEX(COALESCE(STR(?sourceLabel), ""), "${termPattern}", "i"))
   }
+  ${relationClause}
   GRAPH <${this.graphdb.resourceGraph}> {
     ?resource a hub:SemanticResource ; dcterms:title ?resourceTitle ; hub:accessLevel ?accessLevel ; hub:namespaceURI ?namespaceURI .
     FILTER(STRSTARTS(STR(?matchedTerm), STR(?namespaceURI)))
     ${accessClause}
   }
-  OPTIONAL { ?matchedTerm rdfs:label ?termLabel . FILTER(LANG(?termLabel) = "en" || LANG(?termLabel) = "") }
+  OPTIONAL {
+    GRAPH ?termLabelGraph { ?matchedTerm rdfs:label|skos:prefLabel ?termLabel . }
+    FILTER(LANG(?termLabel) IN ("en", ""))
+  }
 }
 ORDER BY ?resourceTitle ?matchRelation ?matchedTerm`);
         return rows.map((r) => ({
             vocabulary: val(r, 'resourceTitle'), access: val(r, 'accessLevel'), namespace: val(r, 'namespaceURI'),
             term: val(r, 'matchedTerm'), label: val(r, 'termLabel'), relation: val(r, 'matchRelation'),
+            sourceTerm: val(r, 'sourceTerm'), graph: val(r, 'alignmentGraph'),
         }));
     }
     async discover(q) {
